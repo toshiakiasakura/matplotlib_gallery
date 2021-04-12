@@ -1,0 +1,25 @@
+services:
+  lab:
+    image: basic_image 
+
+    # used when create a new image.
+    build:
+        context: .
+        dockerfile: ./Dockerfile
+
+    # ポートの設定("ホスト：コンテナ")
+    ports:
+      - "8888:8888"
+
+    # 環境変数の設定
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+
+    # ボリューム(データの永続化の場所)の設定(ホスト:コンテナ)
+    volumes:
+      - .:/workdir
+      - ${HOST_SNIPPET_PATH:-.}:/home/jovyan/.local/share/jupyter
+
+    # 最後にjupyterLabに接続するためのコマンドを実行する。
+    command: start.sh jupyter lab
+
