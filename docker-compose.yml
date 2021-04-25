@@ -1,6 +1,6 @@
 services:
   lab:
-    image: basic_image 
+    image: matplotlib_gallery
 
     # used when create a new image.
     build:
