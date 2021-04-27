@@ -152,6 +152,8 @@ def stacked_hist_kde_density_and_area_plot_with_stratification():
                              ) as p:
         ax = p.set_ax(1)
         sns.histplot(data=df,x=x,hue=c, fill=True, palette=palette , alpha=1 )
+        move_legend(ax, bbox_to_anchor=(1,0.98))
+
         ax = p.set_ax(2)
         sns.kdeplot(data=df, x=x, hue=c, ax=ax, 
                     common_norm=False, fill=True, alpha=0.3, bw_adjust=0.5, 
