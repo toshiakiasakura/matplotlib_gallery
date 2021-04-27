@@ -86,6 +86,18 @@ def stratified_scatter(ax, df_: pd.DataFrame, x: str, y: str, c: str) -> None:
         ax.scatter(dfM[x], dfM[y], s=1, label=str(col))
         plt.legend(bbox_to_anchor=(1, 0.98), frameon = False)
 
+def stacked_histgram():
+    anes96 = sm.datasets.anes96
+    df = anes96.load_pandas().data
+    x = "age"
+    y = "logpopul"
+    c = "educ"
+
+    color_n = len(df[c].unique())
+    palette = list(plt.cm.tab10.colors[:color_n])
+    with contextplt.Single() as p:
+        sns.histplot(data=df,x=x,hue=c, fill=True, palette=palette , alpha=1 )
+
 def kde_density_with_stratification():
     anes96 = sm.datasets.anes96
     df = anes96.load_pandas().data
@@ -98,7 +110,7 @@ def kde_density_with_stratification():
     with contextplt.Single() as p:
         sns.kdeplot(data=df, x=x, hue=c, ax=p.ax, 
                     common_norm=False, fill=True, alpha=0.3, bw_adjust=0.5, 
-                    palette=palette )
+                    palette=palette)
     
 
 def kde_density_area_plot():
@@ -112,7 +124,7 @@ def kde_density_area_plot():
     palette = list(plt.cm.tab10.colors[:color_n])
     with contextplt.Single() as p:
         sns.kdeplot(data=df, x=x, hue=c, ax=p.ax, 
-                    common_norm=False, multiple="fill", fill=True, 
+                    common_norm=True, multiple="fill", fill=True, 
                     bw_adjust=0.5, palette=palette, alpha=1, linewidth=0.1 )
         move_legend(p.ax, bbox_to_anchor=(1,0.98))
 
@@ -126,7 +138,7 @@ def move_legend(ax, new_loc="upper left", **kws):
     title = old_legend.get_title().get_text()
     ax.legend(handles, labels, loc=new_loc, title=title, **kws)
 
-def kde_density_and_area_plot_with_stratification():
+def stacked_hist_kde_density_and_area_plot_with_stratification():
     anes96 = sm.datasets.anes96
     df = anes96.load_pandas().data
     x = "age"
@@ -135,18 +147,20 @@ def kde_density_and_area_plot_with_stratification():
 
     color_n =  len(df[c].unique())
     palette = list(plt.cm.tab10.colors[:color_n])
-    with contextplt.Multiple(figsize=(6,5), grid=(2,1), label_outer=True,
+    with contextplt.Multiple(figsize=(6,8), dpi=150,grid=(3,1), label_outer=True,
                              suptitle="kde density and area plot", 
                              ) as p:
         ax = p.set_ax(1)
+        sns.histplot(data=df,x=x,hue=c, fill=True, palette=palette , alpha=1 )
+        ax = p.set_ax(2)
         sns.kdeplot(data=df, x=x, hue=c, ax=ax, 
                     common_norm=False, fill=True, alpha=0.3, bw_adjust=0.5, 
                     palette=palette )
         move_legend(ax, bbox_to_anchor=(1,0.98))
 
-        ax = p.set_ax(2)
+        ax = p.set_ax(3)
         sns.kdeplot(data=df, x=x, hue=c, ax=ax, 
-                    common_norm=False, multiple="fill", fill=True, 
+                    common_norm=True, multiple="fill", fill=True, 
                     bw_adjust=0.5, palette=palette, alpha=1, linewidth=0.1 )
         move_legend(ax, bbox_to_anchor=(1,0.98))
 
