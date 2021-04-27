@@ -148,7 +148,7 @@ def stacked_hist_kde_density_and_area_plot_with_stratification():
     color_n =  len(df[c].unique())
     palette = list(plt.cm.tab10.colors[:color_n])
     with contextplt.Multiple(figsize=(6,8), dpi=150,grid=(3,1), label_outer=True,
-                             suptitle="kde density and area plot", 
+                             suptitle="stacked hist., kde density and area plot", 
                              ) as p:
         ax = p.set_ax(1)
         sns.histplot(data=df,x=x,hue=c, fill=True, palette=palette , alpha=1 )
