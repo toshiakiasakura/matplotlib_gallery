@@ -12,12 +12,86 @@ import pandas as pd
 import numpy as np
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.cm as cm
+import matplotlib.dates as mdates
+from matplotlib.lines import Line2D
 import seaborn as sns
 
 import statsmodels.api as sm
 
 # can install by `pip install contextplt`
 import contextplt as cplt
+
+def illustration_of_text_objects():
+    x = np.random.rand(100)*100
+    y = np.random.rand(100)*100
+    with cplt.Single(xlabel="xlabel", ylabel="ylabel", title="title") as p:
+        p.ax.scatter(x,y, s=1)
+        p.ax.text(10, 10, "Absolute position")
+        p.ax.text(0.4,0.4, "Relative position", transform=p.ax.transAxes)
+        p.ax.text(0.95,0.03, "Relative position of\n Figure object", 
+                    transform=p.fig.transFigure, fontsize=8, ha="right")
+
+def illustration_of_legend_objects():
+    with cplt.Single(xlabel="xlabel", ylabel="ylabel", title="title") as p:
+        for i in range(3):
+            x = np.random.rand(100)*100
+            y = np.random.rand(100)*100
+            p.ax.scatter(x,y, s=1, label=f"sample{i}")
+        plt.legend(loc=(1.00,0.7), frameon=False)
+
+def create_legend_by_oneself():
+    patches = create_patch_for_label(label_names = ["test1", "test2", "test3", "NAN"], 
+                                     color=["red","blue", "orange", "grey"] , line=True)
+    fig = plt.figure(figsize=(4,4), dpi=200)
+    ax = fig.add_subplot(111)
+    ax.axes.xaxis.set_visible(False)
+    ax.axes.yaxis.set_visible(False)
+    plt.legend(handles=patches, frameon=False)
+    plt.show()
+
+def create_patch_for_label(
+    label_names: List[str], 
+    label_title: str = "", 
+    cmap_name: str = "tab10", 
+    color : Union[List[str], List[Tuple]] = None,
+    line : bool = False,
+    ) -> List[mpatches.Patch]:
+    """Create list of patches for legend.
+
+    Args:
+        label_names : list of label names. 
+        label_title : title of label handle.
+        cmap_name : colormap name. 
+        color : If color is specified, use this color set to display.
+        line : legend becomes line style. 
+
+    Examples:
+        >>> patches = gallery.create_patch_for_label(label_names = ["test1", "test2", "test3"], color=["red","blue", "orange"] , line=True)
+        >>> fig = plt.figure(figsize=(6,6), dpi=300 )
+        >>> ax = fig.add_subplot(111)
+        >>> ax.axes.xaxis.set_visible(False)
+        >>> ax.axes.yaxis.set_visible(False)
+        >>> plt.legend(handles=patches, frameon=False)
+        >>> plt.show()
+    """
+    cmap = plt.get_cmap(cmap_name)
+    patches = []
+    for i, name in enumerate(label_names):
+        if name == "NAN":
+            c = "grey"
+        elif color == None:
+            c = cmap(i)
+        else:
+            c = color[i]
+            
+        if line:
+            patch = Line2D([0], [0], color=c, label=name)
+        else:
+            patch = mpatches.Patch(color=c, label=name)
+        patches.append(patch)
+    return(patches)
 
 def run_simple_scatter():
     anes96 = sm.datasets.anes96
