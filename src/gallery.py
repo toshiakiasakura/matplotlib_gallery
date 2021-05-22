@@ -271,3 +271,79 @@ def stacked_hist_kde_density_and_area_plot_with_stratification(
         move_legend(ax, bbox_to_anchor=(1,0.98))
 
 
+def run_time_series_simple_barplot():
+    df = sm.datasets.get_rdataset("Melanoma", "MASS").data
+    x = "year"
+    time_series_simple_barplot(df, x)
+
+def time_series_simple_barplot(df : pd.DataFrame, x : str) -> None:
+    """
+    Args:
+        df : dataframe.
+        x : a column containing int data type, supposed to be year. 
+        
+    """
+    ser = df["year"].value_counts()
+    with cplt.Single(title="Yearly count of cases in dataset",
+                     xlabel="year", ylabel="count", rotation=90) as p:
+        p.ax.bar(ser.index, ser.values, 
+                 width=1, linewidth=0.1, 
+                 color="paleturquoise", edgecolor="black")
+
+def run_time_series_barplot():
+    df = sm.datasets.get_rdataset("Melanoma", "MASS").data
+    # convert int value into pd.Timestamp object.
+    df["year_date"] = pd.to_datetime(df["year"].astype(str))
+    x = "year_date"
+    time_series_barplot(df, x)
+
+def time_series_barplot(df : pd.DataFrame, x : str) -> None:
+
+    """
+    Args:
+        df : dataframe.
+        x : a column containing datetime object.
+    """
+    ser = df["year_date"].value_counts()
+
+    with cplt.Single(title="Yearly count of cases in dataset", 
+                     xlabel="year", ylabel="count", 
+                     rotation=90) as p:
+        p.ax.bar(ser.index, ser.values, 
+                 width=365, linewidth=0.1, 
+                 color="paleturquoise", edgecolor="black")
+        p.ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y/%m"))
+
+def run_timeseries_heatmap():
+    df = sm.datasets.get_rdataset("Melanoma", "MASS").data
+    # Change elements name for good visualization.
+    df["sex"] = df["sex"].replace({0:"female", 1:"male"})
+    time_col = "year"
+    c = "sex"
+    timeseries_heatmap(df, time_col, c)
+
+def timeseries_heatmap(df : pd.DataFrame, time_col : str, c : str) -> None:
+
+    df_ht = pd.crosstab(df[time_col], df[c])
+    df_ht_per = pd.crosstab(df[time_col], df[c], normalize="index")*100
+    # to impute non-existing years.
+    for i in range(df_ht.index.min(), df_ht.index.max() + 1 ):
+        if i not in df_ht.index:
+            df_ht.loc[i] = 0
+            df_ht_per.loc[i] =np.nan 
+    df_ht = df_ht.sort_index()
+    df_ht_per = df_ht_per.sort_index()
+
+    tick_size=6
+    with cplt.Multiple(grid=(1,2), figsize=(8,4)) as p:
+        ax = p.set_ax(1, title="Count")
+        ht = sns.heatmap(df_ht, ax=ax, cmap="Reds", fmt=".0f",
+                        annot=True, linewidths=.2, annot_kws={"fontsize":6})
+        ht.set_xticklabels(ht.get_xmajorticklabels(), fontsize = tick_size)
+        ht.set_yticklabels(ht.get_ymajorticklabels(), fontsize = tick_size)
+
+        ax = p.set_ax(2, title="Percentage")
+        ht = sns.heatmap(df_ht_per, ax=ax, cmap="Reds", fmt=".1f",
+                        annot=True, linewidths=.2, annot_kws={"fontsize":6})
+        ht.set_xticklabels(ht.get_xmajorticklabels(), fontsize = tick_size)
+        ht.set_yticklabels(ht.get_ymajorticklabels(), fontsize = tick_size)
